@@ -15,36 +15,60 @@ const scrapeLogic = async res => {
 			process.env.NODE_ENV === 'production'
 				? process.env.PUPPETEER_EXECUTABLE_PATH
 				: puppeteer.executablePath(),
-		headless: 'new',
+		headless: false,
+		timeout: 60000,
 	});
 	try {
 		const page = await browser.newPage();
 
-		await page.goto(URL);
+		await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 60000 });
 
 		// Set screen size
 		await page.setViewport({ width: 1080, height: 1024 });
-		await page.waitForNavigation(60000);
-		// Type into search box
-		await page.waitForSelector('.sc-dwnOUR', 300000);
-		const coefficientsWrapper = await page.$('.sc-dwnOUR');
-		const coefficients = await page.evaluete(el => {
-			const coefficientsValueEl = el.querySelector('.sc-fLcnxK');
-			const coefficientsValues = [];
-			coefficientsValueEl.forEach(coefficientValueEl => {
-				coefficientsValues.push(coefficientValueEl.textContent);
-			});
+		// await page.waitForNavigation({
+		// 	waitUntil: 'domcontentloaded',
+		// 	timeout: 60000,
+		// });
 
-			return coefficientsValues;
-		}, coefficientsWrapper);
-		console.log(coefficients);
-		res.send(`Balance: ${balance}`);
+		// Type into search box
+		await page.waitForSelector('.sc-hpfkCd', 300000);
+		// const coefficientsWrapper = await page.$('.sc-dwnOUR');
+		// console.log(coefficientsWrapper);
+		const coefficientsWrapper = await page.$eval(
+			'.sc-dwnOUR',
+			element => element,
+		);
+		console.log(coefficientsWrapper);
+
+		// const coefficients = await page.evaluate(el => {
+		// 	console.log(el);
+		// 	const coefficientsValueEl = el.querySelector('.sc-fLcnxK');
+		// 	const coefficientsValues = [];
+		// 	coefficientsValueEl.forEach(coefficientValueEl => {
+		// 		coefficientsValues.push(coefficientValueEl.textContent);
+		// 	});
+
+		// 	return coefficientsValues;
+		// }, coefficientsWrapper);
+		// console.log(coefficients);
 	} catch (e) {
 		console.error(e);
-		res.send(`Something went wrong while running Puppeteer: ${e}`);
 	} finally {
-		await browser.close();
+		//await browser.close();
 	}
 };
 
 module.exports = { scrapeLogic };
+
+// await page.waitForSelector('.sc-dwnOUR', 300000);
+// const coefficientsWrapper = await page.$('.sc-dwnOUR');
+// const coefficients = await page.evaluete(el => {
+// 	const coefficientsValueEl = el.querySelector('.sc-fLcnxK');
+// 	const coefficientsValues = [];
+// 	coefficientsValueEl.forEach(coefficientValueEl => {
+// 		coefficientsValues.push(coefficientValueEl.textContent);
+// 	});
+
+// 	return coefficientsValues;
+// }, coefficientsWrapper);
+// console.log(coefficients);
