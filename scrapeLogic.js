@@ -24,7 +24,7 @@ const scrapeLogic = async res => {
 
 		// Set screen size
 		await page.setViewport({ width: 1080, height: 1024 });
-
+		await page.waitForNavigation(60000);
 		// Type into search box
 		await page.waitForSelector('.sc-hAQmFe', 300000);
 		const balanceEl = await page.$('.sc-hAQmFe');
