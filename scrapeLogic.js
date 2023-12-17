@@ -26,12 +26,18 @@ const scrapeLogic = async res => {
 		await page.setViewport({ width: 1080, height: 1024 });
 		await page.waitForNavigation(60000);
 		// Type into search box
-		await page.waitForSelector('.sc-hAQmFe', 300000);
-		const balanceEl = await page.$('.sc-hAQmFe');
-		const balance = await page.evaluate(el => {
-			return el.textContent;
-		}, balanceEl);
-		console.log({ balance });
+		await page.waitForSelector('.sc-dwnOUR', 300000);
+		const coefficientsWrapper = await page.$('.sc-dwnOUR');
+		const coefficients = await page.evaluete(el => {
+			const coefficientsValueEl = el.querySelector('.sc-fLcnxK');
+			const coefficientsValues = [];
+			coefficientsValueEl.forEach(coefficientValueEl => {
+				coefficientsValues.push(coefficientValueEl.textContent);
+			});
+
+			return coefficientsValues;
+		}, coefficientsWrapper);
+		console.log(coefficients);
 		res.send(`Balance: ${balance}`);
 	} catch (e) {
 		console.error(e);
