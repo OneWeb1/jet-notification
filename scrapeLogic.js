@@ -1,51 +1,43 @@
-const puppeteer = require("puppeteer");
-require("dotenv").config();
+const puppeteer = require('puppeteer');
+require('dotenv').config();
 
-const scrapeLogic = async (res) => {
-  const browser = await puppeteer.launch({
-    args: [
-      "--disable-setuid-sandbox",
-      "--no-sandbox",
-      "--single-process",
-      "--no-zygote",
-    ],
-    executablePath:
-      process.env.NODE_ENV === "production"
-        ? process.env.PUPPETEER_EXECUTABLE_PATH
-        : puppeteer.executablePath(),
-  });
-  try {
-    const page = await browser.newPage();
+const URL = `https://lucky-jet.gamedev-atech.cc/?exitUrl=null&language=uk&b=8137c4e5b3acab20ae1f3beb43efac9a78fcaa7c4a27cd6e8a02bf5074ba8de9857cf583774d79836cd757f40d50d77dd3b276632df2208273725233bae66c554f83a1d1981b5f2fb0b84ed7222c2f5399a3c25fb5752c3859468772cedb1166b93c6f9070.80429a59887f8724d9270af78d143b0a`;
 
-    await page.goto("https://developer.chrome.com/");
+const scrapeLogic = async res => {
+	const browser = await puppeteer.launch({
+		args: [
+			'--disable-setuid-sandbox',
+			'--no-sandbox',
+			'--single-process',
+			'--no-zygote',
+		],
+		executablePath:
+			process.env.NODE_ENV === 'production'
+				? process.env.PUPPETEER_EXECUTABLE_PATH
+				: puppeteer.executablePath(),
+	});
+	try {
+		const page = await browser.newPage();
 
-    // Set screen size
-    await page.setViewport({ width: 1080, height: 1024 });
+		await page.goto(URL);
 
-    // Type into search box
-    await page.type(".search-box__input", "automate beyond recorder");
+		// Set screen size
+		await page.setViewport({ width: 1080, height: 1024 });
 
-    // Wait and click on first result
-    const searchResultSelector = ".search-box__link";
-    await page.waitForSelector(searchResultSelector);
-    await page.click(searchResultSelector);
-
-    // Locate the full title with a unique string
-    const textSelector = await page.waitForSelector(
-      "text/Customize and automate"
-    );
-    const fullTitle = await textSelector.evaluate((el) => el.textContent);
-
-    // Print the full title
-    const logStatement = `The title of this blog post is ${fullTitle}`;
-    console.log(logStatement);
-    res.send(logStatement);
-  } catch (e) {
-    console.error(e);
-    res.send(`Something went wrong while running Puppeteer: ${e}`);
-  } finally {
-    await browser.close();
-  }
+		// Type into search box
+		await page.waitForSelector('.sc-hAQmFe', 300000);
+		const balanceEl = await page.$('.sc-hAQmFe');
+		const balance = await page.evaluate(el => {
+			return el.textContent;
+		}, balanceEl);
+		console.log({ balance });
+		res.send(`Balance: ${balance}`);
+	} catch (e) {
+		console.error(e);
+		res.send(`Something went wrong while running Puppeteer: ${e}`);
+	} finally {
+		await browser.close();
+	}
 };
 
 module.exports = { scrapeLogic };
